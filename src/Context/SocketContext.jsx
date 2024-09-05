@@ -25,9 +25,9 @@ export const SocketProvider = ({ children }) => {
       setToken(savedToken); // Set token when found
     }
   }, []);
-  console.log(import.meta.env.VITE_PUBLIC_BACKEND_URL)
+  console.log(import.meta.env.VITE_PUBLIC_BACKEND_URL);
   useEffect(() => {
-    if (!token) return; 
+    if (!token) return;
     const socketConnection = io(`${import.meta.env.VITE_PUBLIC_BACKEND_URL}`, {
       auth: {
         token: token, // Use token in socket auth
@@ -43,7 +43,7 @@ export const SocketProvider = ({ children }) => {
     return () => {
       socketConnection.disconnect(); // Clean up when component unmounts
     };
-  }, [token]); 
+  }, [token]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUser }}>
