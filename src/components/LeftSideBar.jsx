@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
 export default function LeftSideBar() {
-  const driverUrl = "driver/auth/admin/drivers";
-  const userUrl = "user/auth/get_all";
+  const driverUrl = "dashboard/all-drivers";
+  const userUrl = "dashboard/all-users";
   const token = localStorage.getItem("accessToken");
   const [users, setUsers] = useState([]);
   useEffect(() => {
@@ -11,8 +11,13 @@ export default function LeftSideBar() {
     if (token) {
       decoded = jwtDecode(token);
     }
+    // fetch(
+    //   `http://192.168.10.153:5050/${
+    //     decoded?.role === "DRIVER" ? userUrl : driverUrl
+    //   }`
+    // )
     fetch(
-      `http://192.168.10.153:5050/${
+      `http://192.168.10.152:6060/${
         decoded?.role === "DRIVER" ? userUrl : driverUrl
       }`
     )

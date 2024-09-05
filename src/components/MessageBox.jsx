@@ -10,18 +10,19 @@ export default function MessageBox() {
   const token = localStorage.getItem("accessToken");
   const decodedData = jwtDecode(token);
   const [allMessage, setAllMessage] = useState([]);
+  console.log("dskjdkfj", allMessage);
   const currentMessage = useRef(null);
   console.log(userData);
   const handleSendMessage = (e) => {
     e.preventDefault();
     const form = e.target;
     const message = form.message.value;
-    console.log(message);
+    // console.log(message);
     form.reset();
     if (socket) {
       socket.emit("new-message", {
-        sender: decodedData?.userId,
-        receiver: id,
+        senderId: decodedData?.userId,
+        receiverId: id,
         text: message,
         msgByUserId: decodedData?.userId,
       });
@@ -72,9 +73,9 @@ export default function MessageBox() {
             </p>
           </div>
         </div>
-        <div className="overflow-x-hidden overflow-y-scroll h-[80vh]">
+        {/* <div className="overflow-x-hidden overflow-y-scroll h-[80vh]">
           <div className="flex flex-col gap-2 py-2 mx-2" ref={currentMessage}>
-            {allMessage.map((msg, index) => {
+            {allMessage?.map((msg, index) => {
               return (
                 <div
                   key={index}
@@ -84,7 +85,7 @@ export default function MessageBox() {
                       : "bg-white"
                   }`}
                 >
-                  {/* <div className="w-full relative"></div> */}
+
                   <p className="px-2">{msg.text}</p>
                   <p className="text-xs ml-auto w-fit">
                     {moment(msg.createdAt).format("hh:mm")}
@@ -93,7 +94,7 @@ export default function MessageBox() {
               );
             })}
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="">
