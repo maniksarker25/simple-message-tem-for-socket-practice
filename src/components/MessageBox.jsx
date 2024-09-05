@@ -97,6 +97,44 @@ export default function MessageBox() {
       </div>
 
       <div className="">
+        {openImageVideoUpload && (
+          <div className="bg-white shadow rounded absolute bottom-14 w-36 p-2">
+            <form>
+              <label
+                htmlFor="uploadImage"
+                className="flex items-center p-2 px-3 gap-3 hover:bg-slate-200 cursor-pointer"
+              >
+                <div className="text-primary">
+                  <FaImage size={18} />
+                </div>
+                <p>Image</p>
+              </label>
+              <label
+                htmlFor="uploadVideo"
+                className="flex items-center p-2 px-3 gap-3 hover:bg-slate-200 cursor-pointer"
+              >
+                <div className="text-purple-500">
+                  <FaVideo size={18} />
+                </div>
+                <p>Video</p>
+              </label>
+
+              <input
+                type="file"
+                id="uploadImage"
+                onChange={handleUploadImage}
+                className="hidden"
+              />
+
+              <input
+                type="file"
+                id="uploadVideo"
+                onChange={handleUploadVideo}
+                className="hidden"
+              />
+            </form>
+          </div>
+        )}
         <form onSubmit={handleSendMessage}>
           <div className="flex justify-end  -end">
             <input type="text" name="message" className="w-full" />
