@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSocket } from "../Context/SocketContext";
 import { jwtDecode } from "jwt-decode";
+import { FaPlus } from "react-icons/fa6";
 import moment from "moment";
+import { FaImage } from "react-icons/fa6";
+import { FaVideo } from "react-icons/fa6";
+import { IoClose } from "react-icons/io5";
+import { uploadFile } from "../utils/uploadfile";
 export default function MessageBox() {
   const { id } = useParams();
   const { socket } = useSocket();
@@ -10,7 +15,13 @@ export default function MessageBox() {
   const token = localStorage.getItem("accessToken");
   const decodedData = jwtDecode(token);
   const [allMessage, setAllMessage] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
   const currentMessage = useRef(null);
+  const [newMessage, setNewMessage] = useState({
+    imageUrl: "",
+    videoUrl: "",
+  });
   console.log(userData);
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -24,8 +35,17 @@ export default function MessageBox() {
         receiver: id,
         text: message,
         msgByUserId: decodedData?.userId,
+        imageUrl: newMessage?.imageUrl,
+        videoUrl: newMessage?.videoUrl,
+      });
+      setNewMessage({
+        imageUrl: "",
+        videoUrl: "",
       });
     }
+  };
+  const handleUploadImageVideoOpen = () => {
+    setOpenImageVideoUpload((preve) => !preve);
   };
 
   useEffect(() => {
@@ -36,6 +56,59 @@ export default function MessageBox() {
       });
     }
   }, [allMessage]);
+
+  // for image and video
+  // handle upload image
+  const handleUploadImage = async (e) => {
+    const file = e.target.files[0];
+
+    setLoading(true);
+    const uploadPhoto = await uploadFile(file);
+    setLoading(false);
+    setOpenImageVideoUpload(false);
+
+    setNewMessage((preve) => {
+      return {
+        ...preve,
+        imageUrl: uploadPhoto.url,
+      };
+    });
+  };
+
+  // clear image
+  const handleClearUploadImage = () => {
+    setMessage((preve) => {
+      return {
+        ...preve,
+        imageUrl: "",
+      };
+    });
+  };
+  // handle upload video
+  const handleUploadVideo = async (e) => {
+    const file = e.target.files[0];
+
+    setLoading(true);
+    const uploadPhoto = await uploadFile(file);
+    setLoading(false);
+    setOpenImageVideoUpload(false);
+
+    setMessage((preve) => {
+      return {
+        ...preve,
+        videoUrl: uploadPhoto.url,
+      };
+    });
+  };
+  // clear video
+  const handleClearUploadVideo = () => {
+    setMessage((preve) => {
+      return {
+        ...preve,
+        videoUrl: "",
+      };
+    });
+  };
   // use useEffect for message page and message user
   useEffect(() => {
     if (socket && id) {
@@ -93,10 +166,33 @@ export default function MessageBox() {
               );
             })}
           </div>
+          {newMessage.imageUrl && (
+            <div className="w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden">
+              <div
+                className="w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600"
+                onClick={handleClearUploadImage}
+              >
+                <IoClose size={30} />
+              </div>
+              <div className="bg-white p-3">
+                <img
+                  src={message.imageUrl}
+                  alt="uploadImage"
+                  className="aspect-square w-full h-full max-w-sm m-2 object-scale-down"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="">
+        <button
+          onClick={handleUploadImageVideoOpen}
+          className="flex justify-center items-center w-11 h-11 rounded-full hover:bg-primary hover:text-white"
+        >
+          <FaPlus size={20} />
+        </button>
         {openImageVideoUpload && (
           <div className="bg-white shadow rounded absolute bottom-14 w-36 p-2">
             <form>
