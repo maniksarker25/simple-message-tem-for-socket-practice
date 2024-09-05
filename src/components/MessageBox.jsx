@@ -9,6 +9,7 @@ export default function MessageBox() {
   const [userData, setUserData] = useState(null);
   const token = localStorage.getItem("accessToken");
   const decodedData = jwtDecode(token);
+  console.log("decoded data", decodedData);
   const [allMessage, setAllMessage] = useState([]);
   console.log("dskjdkfj", allMessage);
   const currentMessage = useRef(null);
@@ -20,6 +21,7 @@ export default function MessageBox() {
     // console.log(message);
     form.reset();
     if (socket) {
+      console.log(decodedData?.userId, id, message);
       socket.emit("new-message", {
         senderId: decodedData?.userId,
         receiverId: id,
