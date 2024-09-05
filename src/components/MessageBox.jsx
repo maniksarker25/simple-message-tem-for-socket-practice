@@ -36,7 +36,7 @@ export default function MessageBox() {
       });
     }
   }, [allMessage]);
-
+  // use useEffect for message page and message user
   useEffect(() => {
     if (socket && id) {
       console.log("socket massage page");
@@ -51,7 +51,7 @@ export default function MessageBox() {
       });
     }
   }, []);
-  // changes
+  // changes-----------------------
   return (
     <div>
       <div className="h-[90vh]">
