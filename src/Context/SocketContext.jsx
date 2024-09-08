@@ -1,4 +1,5 @@
 // src/context/SocketContext.js
+import { jwtDecode } from "jwt-decode";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
 
@@ -15,6 +16,8 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [onlineUser, setOnlineUser] = useState([]);
   const [token, setToken] = useState(null);
+  // const authToken = localStorage.getItem("accessToken");
+  // const decodedData = jwtDecode(authToken);
   console.log(onlineUser);
 
   useEffect(() => {
@@ -25,7 +28,6 @@ export const SocketProvider = ({ children }) => {
       setToken(savedToken); // Set token when found
     }
   }, []);
-  console.log(import.meta.env.VITE_PUBLIC_BACKEND_URL);
   useEffect(() => {
     if (!token) return;
     const socketConnection = io(`${import.meta.env.VITE_PUBLIC_BACKEND_URL}`, {
@@ -37,6 +39,7 @@ export const SocketProvider = ({ children }) => {
     socketConnection.on("onlineUser", (data) => {
       setOnlineUser(data); // Update onlineUser in context
     });
+    // socketConnection.emit("notification-page", decodedData?.userId);
 
     setSocket(socketConnection); // Set socket in state
 

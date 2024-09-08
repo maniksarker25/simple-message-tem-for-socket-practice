@@ -6,6 +6,7 @@ export default function LeftSideBar() {
   const userUrl = "user/auth/get_all";
   const token = localStorage.getItem("accessToken");
   const [users, setUsers] = useState([]);
+  const [allUser, setAllUser] = useState([]);
   useEffect(() => {
     let decoded;
     if (token) {
@@ -19,6 +20,44 @@ export default function LeftSideBar() {
       .then((res) => res.json())
       .then((data) => setUsers(data?.data));
   }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("sidebar", user?._id);
+
+      socket.on("conversation", (data) => {
+        // Process the conversation data
+        const conversationUserData = data.map((conversationUser) => {
+          if (
+            conversationUser?.sender?._id === conversationUser?.receiver?._id
+          ) {
+            return {
+              ...conversationUser,
+              userDetails: conversationUser?.sender,
+            };
+          } else if (conversationUser?.receiver?._id !== user?._id) {
+            return {
+              ...conversationUser,
+              userDetails: conversationUser.receiver,
+            };
+          } else {
+            return {
+              ...conversationUser,
+              userDetails: conversationUser.sender,
+            };
+          }
+        });
+
+        // Update the state with the processed data
+        setAllUser(conversationUserData);
+      });
+
+      // Cleanup listener on component unmount
+      return () => {
+        socket.off("conversation");
+      };
+    }
+  }, [socket, user]);
   return (
     <div>
       <div>
