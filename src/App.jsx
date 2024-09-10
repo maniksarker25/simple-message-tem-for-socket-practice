@@ -9,14 +9,17 @@ const App = () => {
   const { socket } = useSocket();
   const token = localStorage.getItem("accessToken");
   const decodedData = jwtDecode(token);
-  const [notifications, setNotifications] = useState({});
+  // const [notifications, setNotifications] = useState({});
+  const [notificationCount, setNotificationCount] = useState(null);
   useEffect(() => {
     if (socket && decodedData?.userId) {
       console.log("mice on this ting");
       socket.emit("notification-page", decodedData?.userId);
       socket.on("notifications", (data) => {
         console.log("count with notifications", data);
-        setNotifications(data);
+        // setNotifications(data);
+        console.log(data);
+        setNotificationCount(data);
       });
     }
   }, [socket && decodedData?.userId]);
@@ -46,9 +49,14 @@ const App = () => {
                 onClick={handleSeenMsg}
                 className="cursor-pointer"
               />
-              {notifications?.unseenCount > 0 && (
+              {/* {notifications?.unseenCount > 0 && (
                 <div className="bg-red-500 absolute w-6 h-6 rounded-full top-0 text-white font-bold">
                   {notifications?.unseenCount}
+                </div>
+              )} */}
+              {notificationCount > 0 && (
+                <div className="bg-red-500 absolute w-6 h-6 rounded-full top-0 text-white font-bold">
+                  {notificationCount}
                 </div>
               )}
             </div>

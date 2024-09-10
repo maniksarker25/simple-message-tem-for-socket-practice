@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { FaImage } from "react-icons/fa6";
+import { FaVideo } from "react-icons/fa6";
+import { useSocket } from "../Context/SocketContext";
 export default function LeftSideBar() {
   const driverUrl = "driver/auth/admin/drivers";
   const userUrl = "user/auth/get_all";
   const token = localStorage.getItem("accessToken");
+  const decoded = jwtDecode(token);
+  console.log("decode", decoded);
   const [users, setUsers] = useState([]);
   const [allUser, setAllUser] = useState([]);
+  console.log("all user", allUser);
+  const { socket } = useSocket();
+  const location = useLocation();
+  const pathname = location.pathname;
   useEffect(() => {
     let decoded;
     if (token) {
@@ -23,11 +32,12 @@ export default function LeftSideBar() {
 
   useEffect(() => {
     if (socket) {
-      socket.emit("sidebar", user?._id);
+      // socket.emit("sidebar", decoded?.userId);
 
       socket.on("conversation", (data) => {
         // Process the conversation data
-        const conversationUserData = data.map((conversationUser) => {
+        console.log("conversation", data);
+        const conversationUserData = data?.map((conversationUser) => {
           if (
             conversationUser?.sender?._id === conversationUser?.receiver?._id
           ) {
@@ -35,7 +45,7 @@ export default function LeftSideBar() {
               ...conversationUser,
               userDetails: conversationUser?.sender,
             };
-          } else if (conversationUser?.receiver?._id !== user?._id) {
+          } else if (conversationUser?.receiver?._id !== decoded?.userId) {
             return {
               ...conversationUser,
               userDetails: conversationUser.receiver,
@@ -57,11 +67,11 @@ export default function LeftSideBar() {
         socket.off("conversation");
       };
     }
-  }, [socket, user]);
+  }, [socket, decoded?.userId]);
   return (
     <div>
       <div>
-        {users?.map((user, index) => (
+        {/* {users?.map((user, index) => (
           <div key={user?._id}>
             <Link
               to={`message/${user?._id}`}
@@ -77,7 +87,61 @@ export default function LeftSideBar() {
               </div>
             </Link>
           </div>
-        ))}
+        ))} */}
+        {allUser.map((conv, index) => {
+          const isActive = pathname === `/${conv?.userDetails?._id}`;
+          const href =
+            pathname === "/"
+              ? `message/${conv?.userDetails?._id}`
+              : `message/${conv?.userDetails?._id}`;
+
+          return (
+            <Link
+              to={href}
+              key={conv?._id}
+              className={`flex items-center gap-2 py-3 px-2 border border-transparent rounded hover:bg-slate-100 cursor-pointer
+                ${
+                  isActive
+                    ? "border-primary bg-slate-100"
+                    : "hover:border-primary"
+                }`}
+            >
+              <div>
+                <h3 className="text-ellipsis line-clamp-1 font-semibold text-base">
+                  {conv?.userDetails?.name}
+                </h3>
+                <div className="text-slate-500 text-xs flex items-center gap-1">
+                  <div className="flex items-center gap-1">
+                    {conv?.lastMsg?.imageUrl && (
+                      <div className="flex items-center gap-1">
+                        <span>
+                          <FaImage />
+                        </span>
+                        {!conv?.lastMsg?.text && <span>Image</span>}
+                      </div>
+                    )}
+                    {conv?.lastMsg?.videoUrl && (
+                      <div className="flex items-center gap-1">
+                        <span>
+                          <FaVideo />
+                        </span>
+                        {!conv?.lastMsg?.text && <span>Video</span>}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-ellipsis line-clamp-1 ">
+                    {conv?.lastMsg?.text?.slice(0, 25) + "..."}
+                  </p>
+                </div>
+              </div>
+              {Boolean(conv?.unseenMsg) && (
+                <p className="text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-primary text-red-700 font-semibold rounded-full">
+                  {conv?.unseenMsg}
+                </p>
+              )}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ export default function MessageBox() {
   const [userData, setUserData] = useState(null);
   const token = localStorage.getItem("accessToken");
   const decodedData = jwtDecode(token);
+  const role = decodedData?.role;
   const [allMessage, setAllMessage] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
@@ -22,17 +23,21 @@ export default function MessageBox() {
     imageUrl: "",
     videoUrl: "",
   });
-  console.log(userData);
+  // console.log(userData);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     const form = e.target;
     const message = form.message.value;
     console.log(message);
+
     form.reset();
     if (socket) {
       socket.emit("new-message", {
         sender: decodedData?.userId,
+        senderModel: role === "USER" ? "User" : "Driver",
         receiver: id,
+        receiverModel: role === "DRIVER" ? "User" : "Driver",
         text: message,
         msgByUserId: decodedData?.userId,
         imageUrl: newMessage?.imageUrl,
@@ -114,8 +119,9 @@ export default function MessageBox() {
     if (socket && id) {
       console.log("socket massage page");
       socket.emit("message-page", id);
+      // socket.emit("seen", id);
       socket.on("message-user", (data) => {
-        // console.log("user details", data);
+        console.log("user details", data);
         setUserData(data);
       });
 
@@ -123,7 +129,14 @@ export default function MessageBox() {
         setAllMessage(data);
       });
     }
-  }, []);
+  }, [socket, id]);
+
+  useEffect(() => {
+    console.log("all message seen");
+    if (socket && id) {
+      socket.emit("seen", id);
+    }
+  }, [allMessage?.length]);
   // changes-----------------------
   return (
     <div>
