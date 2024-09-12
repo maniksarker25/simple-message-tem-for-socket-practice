@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import LeftSideBar from "./components/LeftSideBar";
 import { useSocket } from "./Context/SocketContext";
 import { IoMdNotifications } from "react-icons/io";
@@ -45,10 +45,12 @@ const App = () => {
           <div className="flex gap-7">
             <h1 className="text-xl font-semibold ">All Users </h1>
             <div>
-              <IoMdNotifications
-                onClick={handleSeenMsg}
-                className="cursor-pointer"
-              />
+              <Link to={"/notification"}>
+                <IoMdNotifications
+                  onClick={handleSeenMsg}
+                  className="cursor-pointer"
+                />
+              </Link>
               {/* {notifications?.unseenCount > 0 && (
                 <div className="bg-red-500 absolute w-6 h-6 rounded-full top-0 text-white font-bold">
                   {notifications?.unseenCount}

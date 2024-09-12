@@ -9,10 +9,10 @@ export default function LeftSideBar() {
   const userUrl = "user/auth/get_all";
   const token = localStorage.getItem("accessToken");
   const decoded = jwtDecode(token);
-  console.log("decode", decoded);
+  // console.log("decode", decoded);
   const [users, setUsers] = useState([]);
   const [allUser, setAllUser] = useState([]);
-  console.log("all user", allUser);
+  // console.log("all user", allUser);
   const { socket } = useSocket();
   const location = useLocation();
   const pathname = location.pathname;
